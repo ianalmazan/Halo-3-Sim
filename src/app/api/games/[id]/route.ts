@@ -10,17 +10,40 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const game = await getGameById(id);
+
+    let game;
+    try {
+      game = await getGameById(id);
+    } catch (e) {
+      console.error('Error in getGameById:', e);
+      return NextResponse.json({ error: `getGameById failed: ${e}` }, { status: 500 });
+    }
 
     if (!game) {
       return NextResponse.json({ error: 'Game not found' }, { status: 404 });
     }
 
-    const [teamScores, playerStats, events] = await Promise.all([
-      getGameTeamScores(id),
-      getGamePlayerStats(id),
-      getGameEvents(id, 20),
-    ]);
+    let teamScores, playerStats, events;
+    try {
+      teamScores = await getGameTeamScores(id);
+    } catch (e) {
+      console.error('Error in getGameTeamScores:', e);
+      return NextResponse.json({ error: `getGameTeamScores failed: ${e}` }, { status: 500 });
+    }
+
+    try {
+      playerStats = await getGamePlayerStats(id);
+    } catch (e) {
+      console.error('Error in getGamePlayerStats:', e);
+      return NextResponse.json({ error: `getGamePlayerStats failed: ${e}` }, { status: 500 });
+    }
+
+    try {
+      events = await getGameEvents(id, 20);
+    } catch (e) {
+      console.error('Error in getGameEvents:', e);
+      return NextResponse.json({ error: `getGameEvents failed: ${e}` }, { status: 500 });
+    }
 
     return NextResponse.json({
       ...game,
@@ -30,7 +53,7 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error fetching game:', error);
-    return NextResponse.json({ error: 'Failed to fetch game' }, { status: 500 });
+    return NextResponse.json({ error: `Failed to fetch game: ${error}` }, { status: 500 });
   }
 }
 
