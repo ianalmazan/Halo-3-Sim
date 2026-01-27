@@ -1,21 +1,104 @@
 # Deploying Halo 3 Game Simulator to Supabase + Vercel
 
-This guide documents the complete deployment process for the Halo 3 Game Simulator app using Supabase (PostgreSQL database) and Vercel (Next.js hosting).
+This guide documents the complete deployment process for the Halo 3 Game Simulator app using GitHub, Supabase (PostgreSQL database), and Vercel (Next.js hosting).
 
 ## Prerequisites
 
 - GitHub account
 - Supabase account (free tier works)
 - Vercel account (free tier works)
-- Code pushed to a GitHub repository
+- Node.js 18+ installed locally
+- Git installed locally
 
 ## Deployment Order
 
-**Important:** Follow these steps in order. The database must be fully set up before deploying to Vercel.
+**Important:** Follow these steps in order.
+
+1. Push code to GitHub
+2. Set up Supabase database
+3. Run SQL setup in Supabase
+4. Deploy to Vercel with connection string
 
 ---
 
-## Step 1: Create Supabase Project
+## Step 1: Initial GitHub Setup
+
+### First-Time Project Push
+
+If you haven't pushed your project to GitHub yet:
+
+1. **Create a new repository on GitHub:**
+   - Go to [github.com](https://github.com) and sign in
+   - Click the **"+"** icon → **"New repository"**
+   - Name your repository (e.g., "Halo-3-Sim")
+   - Keep it Public or Private (your choice)
+   - **Do NOT** initialize with README, .gitignore, or license
+   - Click **"Create repository"**
+
+2. **Initialize git and push from your local project:**
+
+   ```bash
+   # Navigate to your project folder
+   cd path/to/halo3-game-sim
+
+   # Initialize git repository
+   git init
+   git branch -M main
+
+   # Add all files
+   git add .
+
+   # Create initial commit
+   git commit -m "Initial commit"
+
+   # Add GitHub as remote origin (replace with your repo URL)
+   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+
+   # Push to GitHub
+   git push -u origin main
+   ```
+
+3. **Verify:** Go to your GitHub repository URL and confirm all files are there
+
+### Pushing Updates
+
+After making code changes:
+
+```bash
+# Check what files changed
+git status
+
+# Add changed files (or specific files)
+git add .
+
+# Commit with a descriptive message
+git commit -m "Description of what you changed"
+
+# Push to GitHub
+git push origin main
+```
+
+Vercel will automatically redeploy when changes are pushed to the main branch.
+
+### Common Git Commands
+
+```bash
+# Check current status
+git status
+
+# View commit history
+git log --oneline
+
+# Discard changes to a file
+git checkout -- filename
+
+# Pull latest changes (if working from multiple machines)
+git pull origin main
+```
+
+---
+
+## Step 2: Create Supabase Project
 
 1. Go to [supabase.com](https://supabase.com) and sign up or log in
 2. Click **"New Project"**
@@ -28,7 +111,7 @@ This guide documents the complete deployment process for the Halo 3 Game Simulat
 
 ---
 
-## Step 2: Run the Database Setup SQL
+## Step 3: Run the Database Setup SQL
 
 This step creates all tables, functions, triggers, views, and seed data.
 
@@ -58,7 +141,7 @@ If this returns an error, re-run the views section from `supabase-setup.sql`.
 
 ---
 
-## Step 3: Get the Database Connection String
+## Step 4: Get the Database Connection String
 
 **Important:** Use the Transaction Pooler connection for Vercel deployments.
 
@@ -78,7 +161,7 @@ postgresql://postgres.xxxxxxxxxxxx:YourPassword@aws-0-us-east-1.pooler.supabase.
 
 ---
 
-## Step 4: Deploy to Vercel
+## Step 5: Deploy to Vercel
 
 1. Go to [vercel.com](https://vercel.com) and sign in with your GitHub account
 2. Click **"Add New Project"**
@@ -86,7 +169,7 @@ postgresql://postgres.xxxxxxxxxxxx:YourPassword@aws-0-us-east-1.pooler.supabase.
 4. **Before clicking Deploy**, expand **"Environment Variables"**
 5. Add the environment variable:
    - **Name:** `DATABASE_URL`
-   - **Value:** Your Supabase connection string (from Step 3)
+   - **Value:** Your Supabase connection string (from Step 4)
 6. Click **"Deploy"**
 7. Wait 1-2 minutes for the build to complete
 
@@ -147,6 +230,36 @@ Once deployed, you'll receive a URL like `https://your-app.vercel.app`
 
 ---
 
+### Issue: "fatal: remote origin already exists"
+
+**Cause:** You already have a remote origin set.
+
+**Solution:**
+```bash
+# Remove existing origin
+git remote remove origin
+
+# Add new origin
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+```
+
+---
+
+### Issue: "error: failed to push some refs"
+
+**Cause:** Remote has changes you don't have locally.
+
+**Solution:**
+```bash
+# Pull and merge remote changes first
+git pull origin main --rebase
+
+# Then push
+git push origin main
+```
+
+---
+
 ## Environment Variables Reference
 
 | Variable | Description | Example |
@@ -155,22 +268,21 @@ Once deployed, you'll receive a URL like `https://your-app.vercel.app`
 
 ---
 
-## Updating the Deployment
+## Updating Your Deployment
 
-After making code changes:
+### Code Changes
 
-1. Push changes to GitHub:
+1. Make your code changes locally
+2. Test locally if needed: `npm run dev`
+3. Push to GitHub:
    ```bash
    git add .
-   git commit -m "Your commit message"
+   git commit -m "Description of changes"
    git push origin main
    ```
+4. Vercel automatically redeploys (takes ~1-2 minutes)
 
-2. Vercel will automatically redeploy when it detects changes to the main branch
-
----
-
-## Database Schema Changes
+### Database Schema Changes
 
 If you need to modify the database schema:
 
@@ -179,11 +291,18 @@ If you need to modify the database schema:
 3. Update `supabase-setup.sql` for future deployments
 4. Redeploy to Vercel if any code changes were needed
 
+### Environment Variable Changes
+
+1. Go to Vercel → Your Project → Settings → Environment Variables
+2. Edit or add variables
+3. Redeploy: Go to Deployments → click "..." on latest → Redeploy
+
 ---
 
 ## Useful Links
 
 - **Supabase Dashboard:** [app.supabase.com](https://app.supabase.com)
 - **Vercel Dashboard:** [vercel.com/dashboard](https://vercel.com/dashboard)
+- **GitHub:** [github.com](https://github.com)
 - **Supabase Docs:** [supabase.com/docs](https://supabase.com/docs)
 - **Vercel Docs:** [vercel.com/docs](https://vercel.com/docs)

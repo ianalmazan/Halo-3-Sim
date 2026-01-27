@@ -129,10 +129,18 @@ export default function GamePage({ params }: GamePageProps) {
     },
   });
 
-  if (isLoading || !game) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-zinc-500">Loading game...</div>
+      </div>
+    );
+  }
+
+  if (!game || game.error) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-red-500">Error: {game?.error || 'Game not found'}</div>
       </div>
     );
   }
@@ -241,16 +249,26 @@ export default function GamePage({ params }: GamePageProps) {
 
       {game.status === 'in_progress' && (
         <>
-          <Scoreboard teamScores={teamScores} scoreToWin={game.gameType?.scoreToWin} />
+          {teamScores.length > 0 && (
+            <Scoreboard teamScores={teamScores} scoreToWin={game.gameType?.scoreToWin} />
+          )}
 
           <div className="grid lg:grid-cols-2 gap-6">
             <div className="space-y-6">
-              <KillRecorder
-                players={players}
-                weapons={weapons}
-                onRecordKill={(data) => recordKillMutation.mutate(data)}
-                isSubmitting={recordKillMutation.isPending}
-              />
+              {players.length > 0 && weapons.length > 0 ? (
+                <KillRecorder
+                  players={players}
+                  weapons={weapons}
+                  onRecordKill={(data) => recordKillMutation.mutate(data)}
+                  isSubmitting={recordKillMutation.isPending}
+                />
+              ) : (
+                <Card className="bg-zinc-900/50 border-zinc-800">
+                  <CardContent className="py-8 text-center text-zinc-500">
+                    Loading game data...
+                  </CardContent>
+                </Card>
+              )}
               <KillFeed events={events} />
             </div>
 
