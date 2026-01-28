@@ -44,7 +44,7 @@ export function ArcadePlayerSelect({
         <div className="absolute inset-0 bg-cyan-500/5 rounded-lg" />
 
         <Select value={selectedPlayerId} onValueChange={onSelect}>
-          <SelectTrigger className="bg-transparent border-none text-white focus:ring-cyan-500/50">
+          <SelectTrigger className="bg-transparent border-none text-white focus:ring-cyan-500/50 relative z-20">
             <SelectValue placeholder="Select your Spartan">
               {selectedPlayer && (
                 <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export function ArcadePlayerSelect({
               )}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent className="bg-zinc-900/95 border-cyan-500/30">
+          <SelectContent className="bg-zinc-900/95 border-cyan-500/30 z-50">
             {players.map((player) => (
               <SelectItem
                 key={player.id}

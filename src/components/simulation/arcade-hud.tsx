@@ -56,7 +56,7 @@ export function ArcadeHud({ children }: ArcadeHudProps) {
       </div>
 
       {/* Content area */}
-      <div className="relative z-10 p-8 pt-12">
+      <div className="relative z-20 p-8 pt-12">
         {children}
       </div>
 

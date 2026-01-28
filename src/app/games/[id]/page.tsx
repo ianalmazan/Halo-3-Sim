@@ -85,9 +85,13 @@ export default function GamePage({ params }: GamePageProps) {
       });
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['game', gameId] });
       queryClient.invalidateQueries({ queryKey: ['gameEvents', gameId] });
+      // Auto-redirect to summary when game ends due to score limit
+      if (data?.gameEnded) {
+        router.push(`/games/${gameId}/summary`);
+      }
     },
   });
 
