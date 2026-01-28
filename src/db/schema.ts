@@ -207,3 +207,22 @@ export const playerAchievementsRelations = relations(playerAchievements, ({ one 
   achievement: one(achievements, { fields: [playerAchievements.achievementId], references: [achievements.id] }),
   game: one(games, { fields: [playerAchievements.gameId], references: [games.id] }),
 }));
+
+export const gameTeamScoresRelations = relations(gameTeamScores, ({ one }) => ({
+  game: one(games, { fields: [gameTeamScores.gameId], references: [games.id] }),
+  team: one(teams, { fields: [gameTeamScores.teamId], references: [teams.id] }),
+}));
+
+export const playerGameStatsRelations = relations(playerGameStats, ({ one }) => ({
+  game: one(games, { fields: [playerGameStats.gameId], references: [games.id] }),
+  user: one(users, { fields: [playerGameStats.userId], references: [users.id] }),
+}));
+
+export const playerLifetimeStatsRelations = relations(playerLifetimeStats, ({ one }) => ({
+  user: one(users, { fields: [playerLifetimeStats.userId], references: [users.id] }),
+}));
+
+export const killStreaksRelations = relations(killStreaks, ({ one }) => ({
+  game: one(games, { fields: [killStreaks.gameId], references: [games.id] }),
+  user: one(users, { fields: [killStreaks.userId], references: [users.id] }),
+}));
