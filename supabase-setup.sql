@@ -521,12 +521,16 @@ FROM users u JOIN player_weapon_stats pws ON u.id = pws.user_id JOIN weapons w O
 -- SEED DATA
 -- =====================
 
--- Teams
+-- Teams (8 colors to support FFA with up to 8 players)
 INSERT INTO teams (name, color) VALUES
     ('Red Team', '#DC2626'),
     ('Blue Team', '#2563EB'),
     ('Green Team', '#16A34A'),
-    ('Orange Team', '#EA580C');
+    ('Orange Team', '#EA580C'),
+    ('Purple', '#9333EA'),
+    ('Cyan', '#06B6D4'),
+    ('Pink', '#EC4899'),
+    ('Yellow', '#EAB308');
 
 -- Maps
 INSERT INTO maps (name, description, max_players) VALUES

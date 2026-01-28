@@ -57,7 +57,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-orange-500">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-orange-500">Career Stats</h1>
         <Select value={selectedUserId} onValueChange={setSelectedUserId}>
           <SelectTrigger className="w-64">
             <SelectValue placeholder="Select a player" />

@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useState } from 'react';
+import { FFAPlayerAssignment } from './ffa-player-assignment';
 
 interface User {
   id: string;
@@ -27,9 +28,10 @@ interface Team {
 interface TeamAssignmentProps {
   users: User[];
   teams: Team[];
-  assignedPlayers: { userId: string; teamId: string }[];
-  onAssign: (userId: string, teamId: string) => void;
+  assignedPlayers: { userId: string; teamId: string | null }[];
+  onAssign: (userId: string, teamId: string | null) => void;
   onRemove: (userId: string) => void;
+  isTeamBased?: boolean;
 }
 
 export function TeamAssignment({
@@ -38,10 +40,25 @@ export function TeamAssignment({
   assignedPlayers,
   onAssign,
   onRemove,
+  isTeamBased = true,
 }: TeamAssignmentProps) {
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [selectedTeam, setSelectedTeam] = useState<string>('');
 
+  // For FFA mode, use the FFA-specific component
+  if (!isTeamBased) {
+    return (
+      <FFAPlayerAssignment
+        users={users}
+        teams={teams}
+        assignedPlayers={assignedPlayers.map(p => ({ userId: p.userId, teamId: p.teamId || null }))}
+        onAssign={onAssign}
+        onRemove={onRemove}
+      />
+    );
+  }
+
+  // Team-based mode logic
   const assignedUserIds = assignedPlayers.map((p) => p.userId);
   const availableUsers = users.filter((u) => !assignedUserIds.includes(u.id));
 
@@ -58,6 +75,9 @@ export function TeamAssignment({
       .map((p) => users.find((u) => u.id === p.userId))
       .filter(Boolean) as User[];
   };
+
+  // Only show first 2 teams (Red and Blue) for team-based games
+  const displayTeams = teams.slice(0, 2);
 
   return (
     <div className="space-y-6">
@@ -84,7 +104,7 @@ export function TeamAssignment({
               <SelectValue placeholder="Choose a team" />
             </SelectTrigger>
             <SelectContent>
-              {teams.map((team) => (
+              {displayTeams.map((team) => (
                 <SelectItem key={team.id} value={team.id}>
                   <div className="flex items-center gap-2">
                     <div
@@ -107,7 +127,7 @@ export function TeamAssignment({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {teams.slice(0, 2).map((team) => (
+        {displayTeams.map((team) => (
           <Card key={team.id}>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">

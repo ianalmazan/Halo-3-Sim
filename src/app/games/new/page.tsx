@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { MapSelector } from '@/components/game/map-selector';
 import { TeamAssignment } from '@/components/game/team-assignment';
 
@@ -47,7 +48,7 @@ export default function NewGamePage() {
   const [selectedMapId, setSelectedMapId] = useState<string | null>(null);
   const [selectedGameTypeId, setSelectedGameTypeId] = useState<string>('');
   const [assignedPlayers, setAssignedPlayers] = useState<
-    { userId: string; teamId: string }[]
+    { userId: string; teamId: string | null }[]
   >([]);
   const [createdGameId, setCreatedGameId] = useState<string | null>(null);
 
@@ -101,7 +102,7 @@ export default function NewGamePage() {
   });
 
   const addPlayerMutation = useMutation({
-    mutationFn: async ({ userId, teamId }: { userId: string; teamId: string }) => {
+    mutationFn: async ({ userId, teamId }: { userId: string; teamId: string | null }) => {
       const res = await fetch(`/api/games/${createdGameId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -125,7 +126,7 @@ export default function NewGamePage() {
     },
   });
 
-  const handleAssignPlayer = async (userId: string, teamId: string) => {
+  const handleAssignPlayer = async (userId: string, teamId: string | null) => {
     if (createdGameId) {
       await addPlayerMutation.mutateAsync({ userId, teamId });
       setAssignedPlayers((prev) => [...prev, { userId, teamId }]);
@@ -149,6 +150,7 @@ export default function NewGamePage() {
   };
 
   const selectedGameType = gameTypes.find((gt) => gt.id === selectedGameTypeId);
+  const isTeamBased = selectedGameType?.isTeamBased ?? true;
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -168,10 +170,13 @@ export default function NewGamePage() {
                 <SelectContent>
                   {gameTypes.map((gt) => (
                     <SelectItem key={gt.id} value={gt.id}>
-                      <div>
+                      <div className="flex items-center gap-2">
                         <span className="font-medium">{gt.name}</span>
-                        <span className="text-xs text-zinc-500 ml-2">
-                          (Score to win: {gt.scoreToWin})
+                        <Badge variant={gt.isTeamBased ? 'default' : 'secondary'} className="text-xs">
+                          {gt.isTeamBased ? 'Team' : 'FFA'}
+                        </Badge>
+                        <span className="text-xs text-zinc-500">
+                          ({gt.scoreToWin} to win)
                         </span>
                       </div>
                     </SelectItem>
@@ -179,9 +184,16 @@ export default function NewGamePage() {
                 </SelectContent>
               </Select>
               {selectedGameType && (
-                <p className="text-sm text-zinc-500 mt-2">
-                  {selectedGameType.description}
-                </p>
+                <div className="mt-2">
+                  <p className="text-sm text-zinc-500">
+                    {selectedGameType.description}
+                  </p>
+                  {!selectedGameType.isTeamBased && (
+                    <Badge variant="outline" className="mt-2 text-cyan-400 border-cyan-400/50">
+                      Free For All - Each player fights for themselves
+                    </Badge>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -212,7 +224,14 @@ export default function NewGamePage() {
         <>
           <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
-              <CardTitle>Assign Players to Teams</CardTitle>
+              <CardTitle className="flex items-center gap-3">
+                {isTeamBased ? 'Assign Players to Teams' : 'Add Players'}
+                {!isTeamBased && (
+                  <Badge variant="secondary" className="text-cyan-400">
+                    Free For All
+                  </Badge>
+                )}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <TeamAssignment
@@ -221,6 +240,7 @@ export default function NewGamePage() {
                 assignedPlayers={assignedPlayers}
                 onAssign={handleAssignPlayer}
                 onRemove={handleRemovePlayer}
+                isTeamBased={isTeamBased}
               />
             </CardContent>
           </Card>
