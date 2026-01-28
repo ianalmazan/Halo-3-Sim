@@ -8,6 +8,7 @@ const navItems = [
   { href: '/', label: 'Home' },
   { href: '/games', label: 'Games' },
   { href: '/games/new', label: 'New Game' },
+  { href: '/sword-battles', label: 'Sword Battles' },
   { href: '/dashboard', label: 'Career Stats' },
   { href: '/leaderboard', label: 'Leaderboard' },
 ];
