@@ -88,13 +88,9 @@ export default function SwordBattlesPage() {
 
   const drawSpartan = useCallback((ctx: CanvasRenderingContext2D, player: Player, isPlayer1: boolean) => {
     const { x, y, facing, isSwinging, swingFrame, color } = player;
-    const flip = facing === 'left' ? -1 : 1;
-    const centerX = x + PLAYER_WIDTH / 2;
+    const facingRight = facing === 'right';
 
     ctx.save();
-    ctx.translate(centerX, y);
-    ctx.scale(flip, 1);
-    ctx.translate(-centerX + (flip === -1 ? PLAYER_WIDTH : 0), 0);
 
     // Legs
     ctx.fillStyle = '#1f2937';
@@ -111,44 +107,49 @@ export default function SwordBattlesPage() {
     ctx.arc(x + 30, y + 12, 18, 0, Math.PI * 2);
     ctx.fill();
 
-    // Visor
+    // Visor (position based on facing direction)
     ctx.fillStyle = '#fbbf24';
     ctx.beginPath();
-    ctx.ellipse(x + 35, y + 12, 8, 5, 0, 0, Math.PI * 2);
+    const visorX = facingRight ? x + 38 : x + 22;
+    ctx.ellipse(visorX, y + 12, 8, 5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Arms
+    // Arms and sword
     ctx.fillStyle = color;
     if (isSwinging) {
       // Sword swing animation
       const swingAngle = (swingFrame / SWING_DURATION) * Math.PI - Math.PI / 4;
+      const armX = facingRight ? x + 45 : x + 15;
       ctx.save();
-      ctx.translate(x + 45, y + 30);
+      ctx.translate(armX, y + 30);
+      if (!facingRight) ctx.scale(-1, 1);
       ctx.rotate(swingAngle);
       // Arm
+      ctx.fillStyle = color;
       ctx.fillRect(0, -5, 25, 10);
       // Sword
       ctx.fillStyle = '#06B6D4';
-      ctx.fillRect(20, -3, 50, 6);
-      // Sword glow
       ctx.shadowColor = '#06B6D4';
       ctx.shadowBlur = 15;
       ctx.fillRect(20, -3, 50, 6);
       ctx.restore();
     } else {
-      // Normal arm position
-      ctx.fillRect(x + 45, y + 25, 20, 10);
+      // Sword arm at rest
+      const swordArmX = facingRight ? x + 45 : x - 5;
+      ctx.fillRect(swordArmX, y + 25, 20, 10);
       // Sword at rest
       ctx.fillStyle = '#06B6D4';
       ctx.shadowColor = '#06B6D4';
       ctx.shadowBlur = 10;
-      ctx.fillRect(x + 55, y + 20, 6, 35);
+      const swordX = facingRight ? x + 55 : x - 1;
+      ctx.fillRect(swordX, y + 20, 6, 35);
     }
 
-    // Left arm
+    // Other arm
     ctx.shadowBlur = 0;
     ctx.fillStyle = color;
-    ctx.fillRect(x - 5, y + 25, 20, 10);
+    const otherArmX = facingRight ? x - 5 : x + 45;
+    ctx.fillRect(otherArmX, y + 25, 20, 10);
 
     ctx.restore();
 
